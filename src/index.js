@@ -5,12 +5,13 @@ import { PORT } from "./config/env.config.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectToRabbitMQ, subscribeToQueue } from "./service/rabbitMQ.js";
+import nodeCron from "node-cron";
 
 dotenv.config();
 const app = express();
 app.use(
     cors({
-        origin: [`${process.env.FRONTEND_URL}`,`http://localhost:5174`],
+        origin: [`${process.env.FRONTEND_URL}`, `http://localhost:5174`],
         credentials: true,
     })
 );
@@ -28,4 +29,10 @@ app.use("/booking", router);
 app.listen(PORT, () => {
     console.log(`Booking Service is running on PORT : ${PORT}`);
     subscribeToQueue("new-booking");
+});
+
+nodeCron.schedule("*/5 * * * * *", async () => {
+    let res = await fetch(`${process.env.SELF}`);
+    res = await res.json();
+    console.log(res.message, " : ", new Date().getSeconds());
 });
