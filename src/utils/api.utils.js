@@ -54,38 +54,38 @@ export class ApiError extends Error {
 
 export const flightResponse = (flight) => {
     return {
-        flight_number: flight.flight_number,
-        departure_time: flight.departure_time,
-        arrival_time: flight.arrival_time,
-        status: flight.status,
+        flight_number: flight?.flight_number,
+        departure_time: flight?.departure_time,
+        arrival_time: flight?.arrival_time,
+        status: flight?.status,
         airplane: {
-            name: flight.airplane.name,
-            code: flight.airplane.code,
+            name: flight?.airplane.name,
+            code: flight?.airplane.code,
         },
         source: {
             airport: {
-                name: flight.source.airport.name,
-                code: flight.source.airport.code,
+                name: flight?.source.airport.name,
+                code: flight?.source.airport.code,
             },
             city: {
-                name: flight.source.city.name,
+                name: flight?.source.city.name,
             },
             country: {
-                name: flight.source.country.name,
-                code: flight.source.country.code,
+                name: flight?.source.country.name,
+                code: flight?.source.country.code,
             },
         },
         destination: {
             airport: {
-                name: flight.destination.airport.name,
-                code: flight.destination.airport.code,
+                name: flight?.destination.airport.name,
+                code: flight?.destination.airport.code,
             },
             city: {
-                name: flight.destination.city.name,
+                name: flight?.destination.city.name,
             },
             country: {
-                name: flight.destination.country.name,
-                code: flight.destination.country.code,
+                name: flight?.destination.country.name,
+                code: flight?.destination.country.code,
             },
         },
     };

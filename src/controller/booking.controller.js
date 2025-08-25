@@ -151,7 +151,6 @@ class BookingController {
 
     async getAllJourneysByUserId(req, res) {
         try {
-
             const { id } = req.user;
 
             const journeys = await BookingService.getAllJourneysByUserId(id);
@@ -162,6 +161,7 @@ class BookingController {
                     new ApiResponse(true, "Journeys", 200, journeys).toJSON()
                 );
         } catch (error) {
+            console.log(error);
             return res
                 .status(error.status || 500)
                 .json(

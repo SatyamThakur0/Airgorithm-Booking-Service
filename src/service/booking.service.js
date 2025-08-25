@@ -87,8 +87,6 @@ class BookingService {
         const bookings = await this.bookingRepository.getBookingsByUserId(
             user_id
         );
-        
-
         const journeys = [];
         for (let booking of bookings) {
             const journey = await this.getJourneyByBookingId(booking.id);
@@ -98,47 +96,46 @@ class BookingService {
     }
 
     async getJourneyByBookingId(booking_id) {
-        const allFlights =
-            await this.bookingFlightRepository.getBookingFlightsByBookingId(
-                booking_id
-            );
-
         let journey = [];
-        let map = new Map();
-        for (let flight of allFlights) {
-            let value = [];
-            if (map.has(flight.leg_order)) {
-                value = map.get(flight.leg_order);
+        try {
+            const allFlights =
+                await this.bookingFlightRepository.getBookingFlightsByBookingId(
+                    booking_id
+                );
+            let map = new Map();
+            for (let flight of allFlights) {
+                let value = [];
+                if (map.has(flight.leg_order)) {
+                    value = map.get(flight.leg_order);
+                }
+                value.push(flight);
+                map.set(flight.leg_order, value);
             }
-            value.push(flight);
-            map.set(flight.leg_order, value);
-        }
-        for (let [key, passengers] of map) {
+            for (let [key, passengers] of map) {
+                let res = await fetch(
+                    `${GATEWAY_URL}/flight/flight/${passengers[0].flight_id}`
+                );
+                res = await res.json();
+                let flight = flightResponse(res.data);
+                flight.booking_id = passengers[0].booking_id;
 
-            let res = await fetch(
-                `${GATEWAY_URL}/flight/flight/${passengers[0].flight_id}`
-            );
-            res = await res.json();
-            let flight = flightResponse(res.data);
-            flight.booking_id = passengers[0].booking_id;
-
-            let passenger_arr = [];
-            passengers.forEach((passenger) => {
-                passenger_arr.push({
-                    name: passenger.passenger_name,
-                    age: passenger.passenger_age,
-                    email: passenger.email,
-                    seat_number: passenger.seat_number,
-                    status: passenger.booking_status,
-                    price: passenger.price,
+                let passenger_arr = [];
+                passengers.forEach((passenger) => {
+                    passenger_arr.push({
+                        name: passenger.passenger_name,
+                        age: passenger.passenger_age,
+                        email: passenger.email,
+                        seat_number: passenger.seat_number,
+                        status: passenger.booking_status,
+                        price: passenger.price,
+                    });
                 });
-            });
-            flight.passengers = passenger_arr;
-            // console.log("booking service journey", flight.passengers);
-            journey[key - 1] = flight;
+                flight.passengers = passenger_arr;
+                journey[key - 1] = flight;
+            }
+        } catch (error) {
+            throw new Error(error);
         }
-        // console.log("booking service journey", journey);
-
         return journey;
     }
 

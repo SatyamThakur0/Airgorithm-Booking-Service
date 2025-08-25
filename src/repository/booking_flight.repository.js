@@ -65,6 +65,8 @@ class BookingFlight {
             const query = `SELECT * FROM booking_flight WHERE booking_id = $1 order by leg_order asc`;
             const result = await client.query(query, [booking_id]);
             return result.rows;
+        } catch (err) {
+            throw new Error(err);
         } finally {
             client.release();
         }
